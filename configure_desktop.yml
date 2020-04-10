@@ -1,7 +1,5 @@
 ---
 - hosts: localhost
-  vars:
-    dotfiles_repo: https://github.com/tuxxy/dotfiles
   tasks:
     - name: Check for and install updates
       become: yes
@@ -9,39 +7,33 @@
         update_cache: yes
         upgrade: yes
 
-    - name: Install ttf-hack font
+    - name: Install fonts
       become: yes
       pacman:
-        name: ttf-hack
+        name: "{{ font_packages }}"
+      vars:
+        font_packages:
+          - ttf-hack
+          - adobo-source-code-pro-fonts
+          - noto-fonts
 
     - name: Clone dotfiles
       git:
         repo: "{{ dotfiles_repo }}"
         dest: ~/dotfiles/
         clone: yes
+      vars:
+        dotfiles_repo: https://github.com/tuxxy/dotfiles
 
     - name: Install .bashrc from dotfiles
       shell: 'mv ~/dotfiles/.bashrc ~/.'
 
-    - name: Install and configure rxvt
-      block:
-        - name: Install rxvt-unicode
-          become: yes
-          pacman:
-            name: rxvt-unicode
-
-        - name: Install .Xdefaults from dotfiles
-          shell: 'mv ~/dotfiles/.Xdefaults ~/.'
-
-        - name: Install .Xresources from dotfiles
-          shell: 'mv ~/dotfiles/.Xresources ~/.'
-
-    - name: Install and configure i3
+    - name: Install and configure i3 w/ related packages
       block:
         - name: Install i3
           become: yes
           pacman:
-            name: i3-wm,i3status
+            name: i3-wm,i3status,picom,feh
 
         - name: Install rofi from the AUR
           aur:
@@ -53,3 +45,41 @@
 
         - name: Install i3 config from dotfiles
           shell: 'mv ~/dotfiles/i3 ~/.config/'
+
+    - name: Install and configure vim
+      block:
+        - name: Install .vimrc from dotfiles
+          shell: 'mv ~/dotfiles/.vimrc ~/.'
+
+        - name: Install plug.vim
+          shell: 'curl -fLo ~/.vim/autoload/plug.vim --create-dirs "{{plug_url}}"'
+          vars:
+            plug_url: https://raw.githubusercontent.com/junegunn/vim-plug/master/plug.vim
+
+        - name: Install vim solarized
+          shell: 'curl -fLo ~/.vim/colors/solarized.vim --create-dirs "{{solarized_url}}"'
+          vars:
+            solarized_url: https://raw.githubusercontent.com/altercation/vim-colors-solarized/master/colors/solarized.vim
+
+        - name: Install vim plugins
+          shell: "vim +'PlugInstall --sync' +qa"
+
+    - name: Build and install st
+      block:
+        - name: Clone st
+          git:
+            repo: "{{ st_repo }}"
+            dest: ~/st/
+            clone: yes
+          vars:
+            st_repo: https://github.com/tuxxy/st
+
+        - name: Build and install st
+          become: yes
+          shell: 'make clean install'
+          args:
+            chdir: ~/st/
+
+
+    - name: Cleanup
+      shell: 'rm -rf ~/dotfiles'

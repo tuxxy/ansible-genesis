@@ -19,6 +19,7 @@
           vars:
             python_packages:
               - ipython
+              - python-virtualenv
 
         - name: Install Rust toolchains
           become: no
@@ -51,6 +52,8 @@
             - youtube-dl
             - pavucontrol
             - ffmpeg
+            - wget
+            - light
 
       - name: Install utilities from the Arch User Repository
         become: no
@@ -59,3 +62,4 @@
         vars:
           aur_packages:
             - magic-wormhole
+            - ttf-symbola
