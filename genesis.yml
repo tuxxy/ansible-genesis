@@ -1,0 +1,57 @@
+---
+- hosts: localhost
+  become: yes
+  tasks:
+    - name: Configure the pacman mirrorlist
+      block:
+        - name: Install reflector
+          pacman:
+            name: reflector
+
+        - name: Generate an optimized mirrorlist
+          shell: 'reflector -c "{{country}}" -f 10 > /etc/pacman.d/mirrorlist'
+          vars:
+            country: DE
+
+    - name: Check for and install updates
+      pacman:
+        update_cache: yes
+        upgrade: yes
+
+    - name: Install basic packages
+      pacman:
+        name: "{{ basic_packages }}"
+      vars:
+        basic_packages:
+          - iw
+          - wpa_supplicant
+          - dialog
+          - dhcpcd
+          - netctl
+          - man
+          - vim
+          - vi
+          - git
+
+    - name: Install yay
+      become: no
+      aur:
+        use: makepkg
+        name: yay
+
+    - name: Install graphics packages and XServer
+      pacman:
+        name: "{{ graphics_packages }}"
+      vars:
+        graphics_packages:
+          - mesa
+          - xf86-video-intel
+          - xorg-server
+          - xorg-xinit
+          - xorg-xrandr
+
+    - name: Enable the automated netctl profile service
+      shell: 'systemctl enable netctl-auto@"{{network_interface}}".service'
+      vars:
+        network_interface: wlp4s0
+

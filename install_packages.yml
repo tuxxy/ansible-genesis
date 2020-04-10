@@ -1,0 +1,61 @@
+---
+- hosts: localhost
+  become: yes
+  tasks:
+    - name: Install development environments and tools
+      block:
+        - name: Install development languages
+          pacman:
+            name: "{{ language_packages }}"
+          vars:
+            language_packages:
+              - python
+              - rustup
+              - go
+
+        - name: Install Python tools
+          pacman:
+            name: "{{ python_packages }}"
+          vars:
+            python_packages:
+              - ipython
+
+        - name: Install Rust toolchains
+          become: no
+          shell: 'rustup toolchain install stable && rustup toolchain install nightly'
+
+        - name: Configure git
+          become: no
+          shell: 'git config --global user.email "{{email}}" && git config --global user.name "{{git_name}}"'
+          vars:
+            email: me@johnpacific.com
+            git_name: tuxxy
+
+    - name: Install browsers
+      pacman:
+        name: firefox,chromium
+
+    - name: Install utility packages
+      block:
+      - name: Install utilities from pacman
+        pacman:
+          name: "{{ utility_packages }}"
+        vars:
+          utility_packages:
+            - macchanger
+            - zathura
+            - mpv
+            - firejail
+            - audacity
+            - nmap
+            - youtube-dl
+            - pavucontrol
+            - ffmpeg
+
+      - name: Install utilities from the Arch User Repository
+        become: no
+        aur:
+          name: "{{ aur_packages }}"
+        vars:
+          aur_packages:
+            - magic-wormhole

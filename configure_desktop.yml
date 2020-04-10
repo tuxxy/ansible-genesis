@@ -1,0 +1,55 @@
+---
+- hosts: localhost
+  vars:
+    dotfiles_repo: https://github.com/tuxxy/dotfiles
+  tasks:
+    - name: Check for and install updates
+      become: yes
+      pacman:
+        update_cache: yes
+        upgrade: yes
+
+    - name: Install ttf-hack font
+      become: yes
+      pacman:
+        name: ttf-hack
+
+    - name: Clone dotfiles
+      git:
+        repo: "{{ dotfiles_repo }}"
+        dest: ~/dotfiles/
+        clone: yes
+
+    - name: Install .bashrc from dotfiles
+      shell: 'mv ~/dotfiles/.bashrc ~/.'
+
+    - name: Install and configure rxvt
+      block:
+        - name: Install rxvt-unicode
+          become: yes
+          pacman:
+            name: rxvt-unicode
+
+        - name: Install .Xdefaults from dotfiles
+          shell: 'mv ~/dotfiles/.Xdefaults ~/.'
+
+        - name: Install .Xresources from dotfiles
+          shell: 'mv ~/dotfiles/.Xresources ~/.'
+
+    - name: Install and configure i3
+      block:
+        - name: Install i3
+          become: yes
+          pacman:
+            name: i3-wm,i3status
+
+        - name: Install rofi from the AUR
+          aur:
+            name: rofi
+            use: yay
+
+        - name: Configure .xinitrc
+          shell: 'echo exec i3 > ~/.xinitrc'
+
+        - name: Install i3 config from dotfiles
+          shell: 'mv ~/dotfiles/i3 ~/.config/'
