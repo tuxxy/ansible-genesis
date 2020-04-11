@@ -40,6 +40,9 @@
             name: rofi
             use: yay
 
+        - name: Configure rofi
+          shell: 'mv ~/dotfiles/rofi ~/.config/'
+
         - name: Configure .xinitrc
           shell: 'echo exec i3 > ~/.xinitrc'
 
