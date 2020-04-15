@@ -49,6 +49,16 @@
         - name: Install i3 config from dotfiles
           shell: 'mv ~/dotfiles/i3 ~/.config/'
 
+    - name: Install and configure firejail
+      block:
+        - name: Install firejail
+          become: yes
+          pacman:
+            name: firejail
+
+        - name: Configure firejail
+          shell: 'mv ~/dotfiles/firejail ~/.config/'
+
     - name: Install and configure vim
       block:
         - name: Install .vimrc from dotfiles
