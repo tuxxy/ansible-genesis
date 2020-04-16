@@ -46,7 +46,6 @@
             - macchanger
             - zathura
             - mpv
-            - firejail
             - audacity
             - nmap
             - youtube-dl
@@ -58,6 +57,7 @@
             - alsautils
             - mpv
             - scrot
+            - tig
 
       - name: Install utilities from the Arch User Repository
         become: no

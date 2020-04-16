@@ -94,5 +94,8 @@
             chdir: ~/st/
 
 
-    - name: Cleanup
+    - name: Cleanup dotfiles
       shell: 'rm -rf ~/dotfiles'
+
+    - name: Cleanup st
+      shell: 'rm -rf ~/st'
