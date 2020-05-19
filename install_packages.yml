@@ -60,6 +60,7 @@
             - tig
             - rtorrent
             - lftp
+            - rsync
 
       - name: Install utilities from the Arch User Repository
         become: no
